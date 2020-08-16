@@ -64,6 +64,7 @@ public class mdbroker
     public static void main(String[] args)
     {
         mdbroker broker = new mdbroker(args.length > 0 && "-v".equals(args[0]));
+//        mdbroker broker = new mdbroker(true);
         broker.bind("tcp://*:5555");
         broker.mediate();
     }
@@ -71,6 +72,7 @@ public class mdbroker
     public mdbroker(boolean verbose)
     {
         this.verbose = verbose;
+//        this.verbose = true;
         this.services = new HashMap<String, Service>();
         this.workers = new HashMap<String, Worker>();
         this.waiting = new ArrayDeque<Worker>();

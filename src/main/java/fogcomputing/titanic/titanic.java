@@ -49,7 +49,7 @@ public class titanic
         public void run(Object[] args, ZContext ctx, Socket pipe)
         {
             mdwrkapi worker = new mdwrkapi(
-                    "tcp://localhost:5555", "titanic.request", false
+                    "tcp://localhost:5555", "titanic.request", true
             );
             ZMsg reply = null;
 
@@ -101,7 +101,7 @@ public class titanic
         public void run(Object[] args)
         {
             mdwrkapi worker = new mdwrkapi(
-                    "tcp://localhost:5555", "titanic.reply", false
+                    "tcp://localhost:5555", "titanic.reply", true
             );
             ZMsg reply = null;
 
@@ -153,7 +153,7 @@ public class titanic
         public void run(Object[] args)
         {
             mdwrkapi worker = new mdwrkapi(
-                    "tcp://localhost:5555", "titanic.close", false
+                    "tcp://localhost:5555", "titanic.close", true
             );
             ZMsg reply = null;
 

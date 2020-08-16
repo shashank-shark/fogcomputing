@@ -39,7 +39,7 @@ public class mdcliapi
     public mdcliapi(String broker, boolean verbose)
     {
         this.broker = broker;
-        this.verbose = verbose;
+        this.verbose = true;
         ctx = new ZContext();
         reconnectToBroker();
     }
