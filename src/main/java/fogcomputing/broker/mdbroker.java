@@ -6,6 +6,7 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map;
 
+import fogcomputing.broker.MDP;
 import org.zeromq.*;
 
 public class mdbroker
@@ -56,23 +57,25 @@ public class mdbroker
     private Map<String, Worker>  workers;
     private Deque<Worker>        waiting;
 
-    private boolean   verbose = false;
-    private Formatter log  = new Formatter(System.out);
+    private boolean   verbose = true;
+    private Formatter log     = new Formatter(System.out);
 
     // ---------------------------------------------------------------------
 
+    /**
+     * Main method - create and start new broker.
+     */
     public static void main(String[] args)
     {
         mdbroker broker = new mdbroker(args.length > 0 && "-v".equals(args[0]));
-//        mdbroker broker = new mdbroker(true);
+        // Can be called multiple times with different endpoints
         broker.bind("tcp://*:5555");
         broker.mediate();
     }
 
     public mdbroker(boolean verbose)
     {
-        this.verbose = verbose;
-//        this.verbose = true;
+        this.verbose = true;
         this.services = new HashMap<String, Service>();
         this.workers = new HashMap<String, Worker>();
         this.waiting = new ArrayDeque<Worker>();
@@ -81,6 +84,7 @@ public class mdbroker
         this.socket = ctx.createSocket(ZMQ.ROUTER);
     }
 
+    // ---------------------------------------------------------------------
     public void mediate()
     {
         while (!Thread.currentThread().isInterrupted()) {
@@ -93,7 +97,7 @@ public class mdbroker
                 if (msg == null)
                     break;
 
-                if (verbose) {
+                if (true) {
                     log.format("I: received message:\n");
                     msg.dump(log.out());
                 }
@@ -215,7 +219,7 @@ public class mdbroker
         if (worker == null) {
             worker = new Worker(identity, address.duplicate());
             workers.put(identity, worker);
-            if (verbose)
+            if (true)
                 log.format("I: registering new worker: %s\n", identity);
         }
         return worker;
@@ -247,6 +251,7 @@ public class mdbroker
             returnCode = services.containsKey(name) ? "200" : "400";
         }
         msg.peekLast().reset(returnCode.getBytes(ZMQ.CHARSET));
+
         ZFrame client = msg.unwrap();
         msg.addFirst(serviceFrame.duplicate());
         msg.addFirst(MDP.C_CLIENT.newFrame());
@@ -256,6 +261,7 @@ public class mdbroker
 
     public synchronized void sendHeartbeats()
     {
+        // Send heartbeats to idle workers if it's time
         if (System.currentTimeMillis() >= heartbeatAt) {
             for (Worker worker : waiting) {
                 sendToWorker(worker, MDP.W_HEARTBEAT, null, null);
@@ -275,7 +281,6 @@ public class mdbroker
 
     public synchronized void workerWaiting(Worker worker)
     {
-        // Queue to broker and service waiting lists
         waiting.addLast(worker);
         worker.service.waiting.addLast(worker);
         worker.expiry = System.currentTimeMillis() + HEARTBEAT_EXPIRY;
@@ -299,7 +304,6 @@ public class mdbroker
 
     public void sendToWorker(Worker worker, MDP command, String option, ZMsg msgp)
     {
-
         ZMsg msg = msgp == null ? new ZMsg() : msgp.duplicate();
 
         if (option != null)
@@ -308,7 +312,7 @@ public class mdbroker
         msg.addFirst(MDP.W_WORKER.newFrame());
 
         msg.wrap(worker.address.duplicate());
-        if (verbose) {
+        if (true) {
             log.format("I: sending %s to worker\n", command);
             msg.dump(log.out());
         }

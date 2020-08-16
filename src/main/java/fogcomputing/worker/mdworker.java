@@ -8,7 +8,7 @@ public class mdworker
     public static void main(String[] args)
     {
         boolean verbose = (args.length > 0 && "-v".equals(args[0]));
-        mdwrkapi workerSession = new mdwrkapi("tcp://localhost:5555", "echo", verbose);
+        mdwrkapi workerSession = new mdwrkapi("tcp://localhost:5555", "echo", true);
 
         ZMsg reply = null;
         while (!Thread.currentThread().isInterrupted()) {
